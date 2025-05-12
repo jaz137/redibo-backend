@@ -4,43 +4,40 @@ const { getUserId } = require("../lib/auth")
 
 const router = express.Router()
 
-// GET /api/comentarios-carro?carroId=...
+// GET /api/comentarios-carro?propietarioId=...
 router.get("/", async (req, res) => {
   try {
-    const { carroId, usuarioId } = req.query
+    const { carroId, usuarioId, hostId } = req.query
 
     const where = {}
     if (carroId) where.id_carro = Number.parseInt(carroId)
     if (usuarioId) where.id_usuario = Number.parseInt(usuarioId)
 
+    // Filtro por hostId
+    if (hostId) {
+      where.carro = { id_usuario_rol: Number.parseInt(hostId) }
+    }
+
     const comentarios = await prisma.comentarioCarro.findMany({
       where,
       include: {
         usuario: {
-          select: {
-            id: true,
-            nombre: true,
-            foto: true,
-          },
+          select: { id: true, nombre: true, foto: true },
         },
         carro: {
           select: {
             id: true,
             marca: true,
             modelo: true,
+            id_usuario_rol: true,
             imagenes: {
-              select: {
-                data: true,
-                public_id: true,
-              },
+              select: { data: true, public_id: true },
               take: 1,
             },
           },
         },
       },
-      orderBy: {
-        fecha_creacion: "desc",
-      },
+      orderBy: { fecha_creacion: "desc" },
     })
 
     return res.json(comentarios)
@@ -70,6 +67,7 @@ router.get("/:id", async (req, res) => {
             id: true,
             marca: true,
             modelo: true,
+            id_usuario_rol: true,
             imagenes: {
               select: {
                 data: true,
