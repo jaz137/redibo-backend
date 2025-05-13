@@ -19,6 +19,7 @@ const reservasRoutes = require("./routes/reservasRoutes")
 const reporteRoutes = require("./routes/reporteRoutes")
 const comentariosCarroRoutes = require("./routes/comentariosCarroRoutes")
 const calificacionesReservaRoutes = require("./routes/calificaciones-reservaRoutes")
+const carroRoutes = require("./routes/carroRoute")
 
 const app = express()
 const prisma = new PrismaClient()
@@ -57,6 +58,7 @@ app.use("/api/reservas", reservasRoutes)
 app.use("/api/reportes", reporteRoutes)
 app.use("/api/comentarios-carro", comentariosCarroRoutes)
 app.use("/api/calificaciones-reserva", calificacionesReservaRoutes)
+app.use("/api/carros", carroRoutes)
 
 
 // Manejo de errores

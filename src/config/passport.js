@@ -1,3 +1,4 @@
+require("dotenv").config();
 const passport = require("passport")
 const GoogleStrategy = require("passport-google-oauth20").Strategy
 const { PrismaClient } = require("@prisma/client")
@@ -15,7 +16,7 @@ passport.use(
       try {
         const email = profile.emails[0].value
 
-        // Buscar si el usuario ya existe por correo o google_id
+       
         const existingUser = await prisma.usuario.findFirst({
           where: {
             OR: [{ correo: email }, { google_id: profile.id }],
@@ -30,7 +31,7 @@ passport.use(
         })
 
         if (existingUser) {
-          // Si el usuario existe pero no tiene google_id o foto, actualizar esos campos
+         
           const updateData = {}
           if (!existingUser.google_id) {
             updateData.google_id = profile.id
@@ -45,7 +46,7 @@ passport.use(
             })
           }
 
-          // Verificar si el perfil está incompleto según campos clave
+         
           const camposRequeridos = [
             existingUser.fecha_nacimiento,
             existingUser.genero,
@@ -57,9 +58,9 @@ passport.use(
             camposRequeridos.some((campo) => campo === null || campo === "" || campo === undefined) ||
             !existingUser.roles?.length
 
-          // Verificar si el perfil está completo
+          
           if (perfilIncompleto) {
-            // El usuario existe pero su perfil está incompleto
+            
             return done(null, {
               isNewUser: false,
               isIncomplete: true,
@@ -98,9 +99,9 @@ passport.use(
               },
             },
           })
-          // Extraer roles para el token JWT
+          
           const roles = userComplete.roles.map((userRole) => userRole.rol.rol)
-          // Usuario ya existe y su perfil está completo
+          
           return done(null, {
             isNewUser: false,
             isIncomplete: false,
@@ -116,7 +117,7 @@ passport.use(
           })
         }
 
-        // Es un usuario nuevo, lo creamos con datos parciales
+       
         const newUser = await prisma.usuario.create({
           data: {
             google_id: profile.id,
@@ -126,7 +127,7 @@ passport.use(
           },
         })
 
-        // Retornamos el nuevo usuario con flag de incompleto
+       
         return done(null, {
           isNewUser: true,
           isIncomplete: true,
